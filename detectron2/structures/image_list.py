@@ -83,7 +83,7 @@ class ImageList(object):
         image_sizes_tensor = [shapes_to_tensor(x) for x in image_sizes]
         max_size = torch.stack(image_sizes_tensor).max(0).values
         
-        max_size = torch.to(device)
+        max_size = max_size.to(device)
        
         if size_divisibility > 1:
             stride = size_divisibility
