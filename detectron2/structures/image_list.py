@@ -77,11 +77,14 @@ class ImageList(object):
         for t in tensors:
             assert isinstance(t, torch.Tensor), type(t)
             assert t.shape[:-2] == tensors[0].shape[:-2], t.shape
-
+        
+        device = device()
         image_sizes = [(im.shape[-2], im.shape[-1]) for im in tensors]
         image_sizes_tensor = [shapes_to_tensor(x) for x in image_sizes]
         max_size = torch.stack(image_sizes_tensor).max(0).values
-
+        
+        max_size = torch.to(device)
+       
         if size_divisibility > 1:
             stride = size_divisibility
             # the last two dims are H,W, both subject to divisibility requirement
