@@ -20,4 +20,5 @@ def init():
         api_key=os.environ['COMET_API_KEY'],
         project_name="dynamichead",
         workspace="shivamsnaik",
+        auto_output_logging="simple"
     )
