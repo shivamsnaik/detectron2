@@ -195,7 +195,7 @@ class CommonMetricPrinter(EventWriter):
                 Used to compute ETA. If not given, ETA will not be printed.
             window_size (int): the losses will be median-smoothed by this window size
         """
-        logging.basicConfig(format='%(message)s', level=logging.DEBUG)
+        logging.basicConfig(format='%(message)s', level=logging.INFO)
         self.logger = logging.getLogger()
         self._max_iter = max_iter
         self._window_size = window_size
