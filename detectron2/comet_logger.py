@@ -11,25 +11,24 @@ from comet_ml import Experiment, ExistingExperiment
 import os
 
 COMET_LOGGER = None
-COMET_LOGGER_EXPERIMENT_ID = None
+
 def init():
     # Init Comet Logger as Global
     global COMET_LOGGER
-    global COMET_LOGGER_EXPERIMENT_ID
 
-    if COMET_LOGGER_EXPERIMENT_ID == None:
+    try:
         COMET_LOGGER = Experiment(
             api_key=os.environ['COMET_API_KEY'],
             project_name="dynamichead",
             workspace="shivamsnaik",
-            auto_output_logging="simple"
+            auto_output_logging="simple",
+            experiment_key=os.environ['EXPERIMENT_KEY']
         )
-        COMET_LOGGER_EXPERIMENT_ID = COMET_LOGGER.get_key()
-    else:
+    except:
         COMET_LOGGER = ExistingExperiment(
             api_key=os.environ['COMET_API_KEY'],
             project_name="dynamichead",
             workspace="shivamsnaik",
             auto_output_logging="simple",
-            previous_experiment=COMET_LOGGER_EXPERIMENT_ID
+            previous_experiment=os.environ['EXPERIMENT_KEY']
         )
