@@ -197,7 +197,7 @@ class CommonMetricPrinter(EventWriter):
             window_size (int): the losses will be median-smoothed by this window size
         """
 
-        self.logger = logging.getLogger("Slurm Logging")
+        self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.DEBUG)
         
         # create console handler and set level to debug
