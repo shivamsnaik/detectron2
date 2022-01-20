@@ -1,7 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
 
 from .utils.env import setup_environment
-import comet_logger
+import detectron2.comet_logger as comet_logger
 
 setup_environment()
 
