@@ -10,6 +10,7 @@ from typing import Optional
 import torch
 from fvcore.common.history_buffer import HistoryBuffer
 import sys
+import neptune.new as neptune
 
 from detectron2.utils.file_io import PathManager
 
@@ -196,27 +197,34 @@ class CommonMetricPrinter(EventWriter):
                 Used to compute ETA. If not given, ETA will not be printed.
             window_size (int): the losses will be median-smoothed by this window size
         """
-
+        
         self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.DEBUG)
+#        self.logger.setLevel(logging.DEBUG)
         
         # create console handler and set level to debug
-        self.consoleHandler = logging.StreamHandler(stream=sys.stdout)
-        self.consoleHandler.setLevel(logging.DEBUG)
+#        self.consoleHandler = logging.StreamHandler(stream=sys.stdout)
+#        self.consoleHandler.setLevel(logging.DEBUG)
         
         # Create formatter to modify output text format
-        self.formatter = logging.Formatter('%(message)s')
+#        self.formatter = logging.Formatter('%(message)s')
         
         # Add formatter to the consoleHandler
-        self.consoleHandler.setFormatter(self.formatter)
+#        self.consoleHandler.setFormatter(self.formatter)
         
         # Add console handler to the logger
-        self.logger.addHandler(self.consoleHandler)
+#        self.logger.addHandler(self.consoleHandler)
         
         
         self._max_iter = max_iter
         self._window_size = window_size
         self._last_write = None  # (step, time) of last call to write(). Used to compute ETA
+
+        # Init Neptune configs
+        
+        self.neptune_logger = neptune.init(
+            project="shivamsnaik/DynamicHead",
+            api_token="eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiIwMWExNjQ0ZC01NWFjLTRlZWYtYjRkMi01MTBkODAxNTI5ZjMifQ==",
+        )  # your credentials
 
     def _get_eta(self, storage) -> Optional[str]:
         if self._max_iter is None:
@@ -287,8 +295,19 @@ class CommonMetricPrinter(EventWriter):
                 memory="\"max_mem\": \"{:.0f}M\"".format(max_mem_mb) if max_mem_mb is not None else "",
             ))
         )
-
-
+        
+        # LOG the same content using Neptune
+        self.neptune_logger["train/eta"].log(eta_string if eta_string else "")
+        self.neptune_logger["train/iter"].log(iteration)
+        
+        for k, v in storage.histories().items():
+            if "loss" in k:
+                self.neptune_logger["train/"+k].log(v.median(self._window_size))
+        self.neptune_logger["train/time"].log(iter_time if iter_time is not None else "")
+        self.neptune_logger["train/date_time"].log(data_time if data_time is not None else "")
+        self.neptune_logger["train/learning_rate"].log(lr)
+        self.neptune_logger["train/memory"].log(max_mem_mb if max_mem_mb is not None else "")
+        
 class EventStorage:
     """
     The user-facing class that provides metric storage functionalities.
