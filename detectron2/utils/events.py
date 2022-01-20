@@ -253,7 +253,7 @@ class CommonMetricPrinter(EventWriter):
             max_mem_mb = None
 
         # NOTE: max_mem is parsed by grep in "dev/parse_results.sh"
-        logger.info(
+        self.logger.info(
             "{{{eta}\"iter\": {iter}, {losses} {time}, {data_time}, \"lr\": {lr}, {memory},}}".format(
                 eta=f"\"eta\": \"{eta_string}\", " if eta_string else "",
                 iter=iteration,
