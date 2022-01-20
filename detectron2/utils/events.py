@@ -9,6 +9,7 @@ from contextlib import contextmanager
 from typing import Optional
 import torch
 from fvcore.common.history_buffer import HistoryBuffer
+import sys
 
 from detectron2.utils.file_io import PathManager
 
@@ -195,8 +196,24 @@ class CommonMetricPrinter(EventWriter):
                 Used to compute ETA. If not given, ETA will not be printed.
             window_size (int): the losses will be median-smoothed by this window size
         """
-        logging.basicConfig(format='%(message)s', level=logging.INFO)
-        self.logger = logging.getLogger()
+
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.DEBUG)
+        
+        # create console handler and set level to debug
+        self.consoleHandler = logging.StreamHandler(stream=sys.stdout)
+        self.consoleHandler.setLevel(logging.DEBUG)
+        
+        # Create formatter to modify output text format
+        self.formatter = logging.Formatter('%(message)s')
+        
+        # Add formatter to the consoleHandler
+        self.consoleHandler.setFormatter(self.formatter)
+        
+        # Add console handler to the logger
+        self.logger.addHandler(self.consoleHandler)
+        
+        
         self._max_iter = max_iter
         self._window_size = window_size
         self._last_write = None  # (step, time) of last call to write(). Used to compute ETA
