@@ -7,7 +7,7 @@ import numpy as np
 import pprint
 import sys
 from collections.abc import Mapping
-
+import detectron2.comet_logger as comet
 
 def print_csv_format(results):
     """
@@ -22,11 +22,7 @@ def print_csv_format(results):
     logger = logging.getLogger(__name__)
 
     # Init Comet Logger
-    comet_logger = Experiment(
-        api_key=os.environ['COMET_API_KEY'],
-        project_name="dynamichead",
-        workspace="shivamsnaik",
-    )
+    comet_logger = comet.COMET_LOGGER
 
     for task, res in results.items():
         if isinstance(res, Mapping):

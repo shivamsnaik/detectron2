@@ -25,7 +25,7 @@ from detectron2.evaluation.fast_eval_api import COCOeval_opt
 from detectron2.structures import Boxes, BoxMode, pairwise_iou
 from detectron2.utils.file_io import PathManager
 from detectron2.utils.logger import create_small_table
-
+import detectron2.comet_logger as comet
 from .evaluator import DatasetEvaluator
 
 
@@ -92,11 +92,7 @@ class COCOEvaluator(DatasetEvaluator):
 
 
         # Init Comet Logger
-        self.comet_logger = Experiment(
-            api_key=os.environ['COMET_API_KEY'],
-            project_name="dynamichead",
-            workspace="shivamsnaik",
-        )
+        self.comet_logger = comet.COMET_LOGGER
 
         self._distributed = distributed
         self._output_dir = output_dir

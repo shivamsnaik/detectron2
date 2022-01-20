@@ -10,9 +10,11 @@ from contextlib import ExitStack, contextmanager
 from typing import List, Union
 import torch
 from torch import nn
+import sys 
 
 from detectron2.utils.comm import get_world_size, is_main_process
 from detectron2.utils.logger import log_every_n_seconds
+import detectron2.comet_logger as comet
 
 
 class DatasetEvaluator:
@@ -130,11 +132,8 @@ def inference_on_dataset(
     logger = logging.getLogger(__name__)
 
     # Init Comet Logger
-    comet_logger = Experiment(
-        api_key=os.environ['COMET_API_KEY'],
-        project_name="dynamichead",
-        workspace="shivamsnaik",
-    )
+    comet_logger = comet.COMET_LOGGER
+
 
 
 
