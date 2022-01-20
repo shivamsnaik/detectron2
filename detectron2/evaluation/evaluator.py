@@ -1,4 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
+# Import comet_ml at the top of your file
+from comet_ml import Experiment
+import os
 import datetime
 import logging
 import time
@@ -125,6 +128,16 @@ def inference_on_dataset(
     """
     num_devices = get_world_size()
     logger = logging.getLogger(__name__)
+
+    # Init Comet Logger
+    comet_logger = Experiment(
+        api_key=os.environ['COMET_API_KEY'],
+        project_name="dynamichead",
+        workspace="shivamsnaik",
+    )
+
+
+
     logger.info("Start inference on {} batches".format(len(data_loader)))
 
     total = len(data_loader)  # inference data loader must have a fixed length
@@ -183,6 +196,12 @@ def inference_on_dataset(
                     ),
                     n=5,
                 )
+                # Log the same metrics for Comet Visualization
+                log_comet_every_n_seconds(
+                    comet_logger,
+                    {"eval/inference_done": (idx + 1)/total, "eval/eta": eta},
+                    n=5,
+                )
             start_data_time = time.perf_counter()
 
     # Measure the time only for this worker (before the synchronization barrier)
@@ -207,6 +226,43 @@ def inference_on_dataset(
     if results is None:
         results = {}
     return results
+
+
+def _find_caller():
+    """
+    Returns:
+        str: module name of the caller
+        tuple: a hashable key to be used to identify different callers
+    """
+    frame = sys._getframe(2)
+    while frame:
+        code = frame.f_code
+        if os.path.join("utils", "logger.") not in code.co_filename:
+            mod_name = frame.f_globals["__name__"]
+            if mod_name == "__main__":
+                mod_name = "detectron2"
+            return mod_name, (code.co_filename, frame.f_lineno, code.co_name)
+        frame = frame.f_back
+
+_LOG_TIMER = {}
+
+def log_comet_every_n_seconds(comet_logger, message, n=1, *, name=None):
+    """
+    Log no more than once per n seconds.
+    Args:
+        lvl (int): the logging level
+        msg (str):
+        n (int):
+        name (str): name of the logger to use. Will use the caller's module by default.
+    """
+    caller_module, key = _find_caller()
+    last_logged = _LOG_TIMER.get(key, None)
+    current_time = time.time()
+    if last_logged is None or current_time - last_logged >= n:
+        
+        for key, val in message.items():
+            comet_logger.log_metric(key, val)
+        _LOG_TIMER[key] = current_time
 
 
 @contextmanager

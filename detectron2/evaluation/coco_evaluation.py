@@ -1,4 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
+# Import comet_ml at the top of your file
+from comet_ml import Experiment
 import contextlib
 import copy
 import io
@@ -87,6 +89,15 @@ class COCOEvaluator(DatasetEvaluator):
                 Otherwise it should be the same length as ROI_KEYPOINT_HEAD.NUM_KEYPOINTS.
         """
         self._logger = logging.getLogger(__name__)
+
+
+        # Init Comet Logger
+        self.comet_logger = Experiment(
+            api_key=os.environ['COMET_API_KEY'],
+            project_name="dynamichead",
+            workspace="shivamsnaik",
+        )
+
         self._distributed = distributed
         self._output_dir = output_dir
         self._use_fast_impl = use_fast_impl
@@ -374,6 +385,11 @@ class COCOEvaluator(DatasetEvaluator):
         self._logger.info("Per-category {} AP: \n".format(iou_type) + table)
 
         results.update({"AP-" + name: ap for name, ap in results_per_category})
+
+        # Update the evaluation metrics to Comet
+        for name, ap in results_per_category:
+            self.comet_logger.log_parameter("eval/{iou_type}/{name}", "{0:.4f}".format(ap))
+
         return results
 
 

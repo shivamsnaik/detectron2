@@ -1,5 +1,8 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
+# Import comet_ml at the top of your file
+from comet_ml import Experiment
 import logging
+import os
 import numpy as np
 import pprint
 import sys
@@ -17,6 +20,14 @@ def print_csv_format(results):
     """
     assert isinstance(results, Mapping) or not len(results), results
     logger = logging.getLogger(__name__)
+
+    # Init Comet Logger
+    comet_logger = Experiment(
+        api_key=os.environ['COMET_API_KEY'],
+        project_name="dynamichead",
+        workspace="shivamsnaik",
+    )
+
     for task, res in results.items():
         if isinstance(res, Mapping):
             # Don't print "AP-category" metrics since they are usually not tracked.
@@ -24,10 +35,14 @@ def print_csv_format(results):
             logger.info("copypaste: Task: {}".format(task))
             logger.info("copypaste: " + ",".join([k[0] for k in important_res]))
             logger.info("copypaste: " + ",".join(["{0:.4f}".format(k[1]) for k in important_res]))
+
+            for k in important_res:
+                comet_logger.log_parameter("eval/{res}/{k[0]}", "{0:.4f}".format(k[1]))
         else:
             logger.info(f"copypaste: {task}={res}")
 
 
+            
 def verify_results(cfg, results):
     """
     Args:
