@@ -196,7 +196,7 @@ class CommonMetricPrinter(EventWriter):
             window_size (int): the losses will be median-smoothed by this window size
         """
         logging.basicConfig(format='%(message)s', level=logging.DEBUG)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger()
         self._max_iter = max_iter
         self._window_size = window_size
         self._last_write = None  # (step, time) of last call to write(). Used to compute ETA
