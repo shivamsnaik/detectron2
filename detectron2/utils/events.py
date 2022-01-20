@@ -197,7 +197,7 @@ class CommonMetricPrinter(EventWriter):
             window_size (int): the losses will be median-smoothed by this window size
         """
 
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger("Slurm Logging")
         self.logger.setLevel(logging.DEBUG)
         
         # create console handler and set level to debug
@@ -271,7 +271,7 @@ class CommonMetricPrinter(EventWriter):
 
         # NOTE: max_mem is parsed by grep in "dev/parse_results.sh"
         self.logger.info(
-            "{{{eta}\"iter\": {iter}, {losses} {time}, {data_time}, \"lr\": {lr}, {memory},}}".format(
+            json.loads("{{{eta}\"iter\": {iter}, {losses} {time}, {data_time}, \"lr\": {lr}, {memory}}}".format(
                 eta=f"\"eta\": \"{eta_string}\", " if eta_string else "",
                 iter=iteration,
                 losses="  ".join(
@@ -284,8 +284,8 @@ class CommonMetricPrinter(EventWriter):
                 time="\"time\": {:.4f}".format(iter_time) if iter_time is not None else "",
                 data_time="\"data_time\": {:.4f}".format(data_time) if data_time is not None else "",
                 lr=lr,
-                memory="max_mem: \"{:.0f}M\"".format(max_mem_mb) if max_mem_mb is not None else "",
-            )
+                memory="\"max_mem\": \"{:.0f}M\"".format(max_mem_mb) if max_mem_mb is not None else "",
+            ))
         )
 
 
