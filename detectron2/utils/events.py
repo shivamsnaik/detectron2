@@ -1,4 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
+# Import comet_ml at the top of your file
+from comet_ml import Experiment
 import datetime
 import json
 import logging
@@ -10,8 +12,7 @@ from typing import Optional
 import torch
 from fvcore.common.history_buffer import HistoryBuffer
 import sys
-# Import comet_ml at the top of your file
-from comet_ml import Experiment
+
 
 from detectron2.utils.file_io import PathManager
 
