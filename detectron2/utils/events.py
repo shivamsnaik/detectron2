@@ -12,6 +12,7 @@ from typing import Optional
 import torch
 from fvcore.common.history_buffer import HistoryBuffer
 import sys
+import detectron2.comet_logger as comet_logger
 
 
 from detectron2.utils.file_io import PathManager
@@ -222,11 +223,7 @@ class CommonMetricPrinter(EventWriter):
         self._last_write = None  # (step, time) of last call to write(). Used to compute ETA
 
         # Init Comet Logger
-        self.comet_logger = Experiment(
-            api_key=os.environ['COMET_API_KEY'],
-            project_name="dynamichead",
-            workspace="shivamsnaik",
-        )
+        self.comet_logger = comet_logger.COMET_LOGGER
 
     def _get_eta(self, storage) -> Optional[str]:
         if self._max_iter is None:
