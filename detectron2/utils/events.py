@@ -253,20 +253,20 @@ class CommonMetricPrinter(EventWriter):
 
         # NOTE: max_mem is parsed by grep in "dev/parse_results.sh"
         self.logger.info(
-            "{{ {eta}, iter: {iter}, {losses} {time},{data_time}, lr: {lr}, {memory}, }}".format(
-                eta=f"eta: {eta_string}  " if eta_string else "",
+            "{{{eta}\"iter\": {iter}, {losses} {time}, {data_time}, \"lr\": {lr}, {memory},}}".format(
+                eta=f"\"eta\": \"{eta_string}\", " if eta_string else "",
                 iter=iteration,
                 losses="  ".join(
                     [
-                        "{}: {:.4g},".format(k, v.median(self._window_size))
+                        "\"{}\": {:.4g},".format(k, v.median(self._window_size))
                         for k, v in storage.histories().items()
                         if "loss" in k
                     ]
                 ),
-                time="time: {:.4f}  ".format(iter_time) if iter_time is not None else "",
-                data_time="data_time: {:.4f}  ".format(data_time) if data_time is not None else "",
+                time="\"time\": {:.4f}".format(iter_time) if iter_time is not None else "",
+                data_time="\"data_time\": {:.4f}".format(data_time) if data_time is not None else "",
                 lr=lr,
-                memory="max_mem: {:.0f}M".format(max_mem_mb) if max_mem_mb is not None else "",
+                memory="max_mem: \"{:.0f}M\"".format(max_mem_mb) if max_mem_mb is not None else "",
             )
         )
 
