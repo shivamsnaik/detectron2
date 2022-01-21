@@ -131,12 +131,6 @@ def inference_on_dataset(
     num_devices = get_world_size()
     logger = logging.getLogger(__name__)
 
-    # Init Comet Logger
-    comet_logger = comet.COMET_LOGGER
-
-
-
-
     logger.info("Start inference on {} batches".format(len(data_loader)))
 
     total = len(data_loader)  # inference data loader must have a fixed length
