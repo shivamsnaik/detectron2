@@ -34,7 +34,7 @@ def print_csv_format(results):
             logger.info("copypaste: " + ",".join(["{0:.4f}".format(k[1]) for k in important_res]))
 
             for k in important_res:
-                comet_logger.log_parameter("eval/{res}/{k[0]}", "{0:.4f}".format(k[1]))
+                comet_logger.log_metric("eval/{res}/{k[0]}", "{0:.4f}".format(k[1]))
         else:
             logger.info(f"copypaste: {task}={res}")
 
