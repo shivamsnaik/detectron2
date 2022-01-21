@@ -344,6 +344,11 @@ class COCOEvaluator(DatasetEvaluator):
             metric: float(coco_eval.stats[idx] * 100 if coco_eval.stats[idx] >= 0 else "nan")
             for idx, metric in enumerate(metrics)
         }
+        
+        for idx, metric in enumerate(metrics):
+            # Update the overall standard evaluation metrics to Comet
+            self.comet_logger.log_metric("eval/{}/{}".format(iou_type, metric), "{0:.4f}".format(float(coco_eval.stats[idx] * 100 if coco_eval.stats[idx] >= 0 else "nan")))
+        
         self._logger.info(
             "Evaluation results for {}: \n".format(iou_type) + create_small_table(results)
         )
@@ -366,6 +371,9 @@ class COCOEvaluator(DatasetEvaluator):
             precision = precision[precision > -1]
             ap = np.mean(precision) if precision.size else float("nan")
             results_per_category.append(("{}".format(name), float(ap * 100)))
+            
+            # Update the per-category evaluation metrics to Comet
+            self.comet_logger.log_metric("eval/{}/AP/{}".format(iou_type, name), "{0:.4f}".format(float(ap * 100)))
 
         # tabulate it
         N_COLS = min(6, len(results_per_category) * 2)
@@ -381,11 +389,6 @@ class COCOEvaluator(DatasetEvaluator):
         self._logger.info("Per-category {} AP: \n".format(iou_type) + table)
 
         results.update({"AP-" + name: ap for name, ap in results_per_category})
-
-        # Update the evaluation metrics to Comet
-        for name, ap in results_per_category:
-            self.comet_logger.log_parameter("eval/{iou_type}/{name}", "{0:.4f}".format(ap))
-
         return results
 
 
