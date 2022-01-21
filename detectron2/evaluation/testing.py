@@ -21,7 +21,8 @@ def print_csv_format(results):
     assert isinstance(results, Mapping) or not len(results), results
     logger = logging.getLogger(__name__)
 
-    # Init Comet Logger
+    # Init Comet Logger again as the previous process gets closed.
+    comet.init()
     comet_logger = comet.COMET_LOGGER
 
     for task, res in results.items():
