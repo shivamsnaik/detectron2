@@ -301,11 +301,11 @@ class CommonMetricPrinter(EventWriter):
         
         for k, v in storage.histories().items():
             if "loss" in k:
-                self.comet_logger.log_metric("train/"+k, v.median(self._window_size), step=iter)
+                self.comet_logger.log_metric("train/"+k, v.median(self._window_size), step=iteration)
         self.comet_logger.log_metric("train/time", iter_time if iter_time is not None else "")
         self.comet_logger.log_metric("train/date_time", data_time if data_time is not None else "")
-        self.comet_logger.log_metric("train/learning_rate", lr, step=iter)
-        self.comet_logger.log_metric("train/memory", max_mem_mb if max_mem_mb is not None else "", step=iter)
+        self.comet_logger.log_metric("train/learning_rate", lr, step=iteration)
+        self.comet_logger.log_metric("train/memory", max_mem_mb if max_mem_mb is not None else "", step=iteration)
         
 class EventStorage:
     """
