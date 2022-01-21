@@ -195,12 +195,6 @@ def inference_on_dataset(
                     ),
                     n=5,
                 )
-                # Log the same metrics for Comet Visualization
-                log_comet_every_n_seconds(
-                    comet_logger,
-                    {"eval/inference_done": (idx + 1)/total, "eval/eta": eta},
-                    n=5,
-                )
             start_data_time = time.perf_counter()
 
     # Measure the time only for this worker (before the synchronization barrier)
