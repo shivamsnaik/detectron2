@@ -25,7 +25,6 @@ from detectron2.evaluation.fast_eval_api import COCOeval_opt
 from detectron2.structures import Boxes, BoxMode, pairwise_iou
 from detectron2.utils.file_io import PathManager
 from detectron2.utils.logger import create_small_table
-import detectron2.comet_logger as comet
 from .evaluator import DatasetEvaluator
 
 
@@ -374,7 +373,7 @@ class COCOEvaluator(DatasetEvaluator):
             results_per_category.append(("{}".format(name), float(ap * 100)))
             
             # Update the per-category evaluation metrics to Comet
-            self.comet_logger.log_metric("eval/{}/AP/{}".format(iou_type, name), "{0:.4f}".format(float(ap * 100)))
+            #self.comet_logger.log_metric("eval/{}/AP/{}".format(iou_type, name), "{0:.4f}".format(float(ap * 100)))
 
         # tabulate it
         N_COLS = min(6, len(results_per_category) * 2)
@@ -580,6 +579,7 @@ def _evaluate_predictions_on_coco(
     """
     Evaluate the coco results using COCOEval API.
     """
+    import detectron2.comet_logger as comet
     assert len(coco_results) > 0
 
     # Init Comet Logger again as the previous process gets closed.

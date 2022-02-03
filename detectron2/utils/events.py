@@ -1,4 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
+# Import comet_ml at the top of your file
+from comet_ml import Experiment
 import datetime
 import json
 import logging
@@ -10,6 +12,7 @@ from typing import Optional
 import torch
 from fvcore.common.history_buffer import HistoryBuffer
 import sys
+import detectron2.comet_logger as comet_logger
 
 
 from detectron2.utils.file_io import PathManager
@@ -219,6 +222,9 @@ class CommonMetricPrinter(EventWriter):
         self._window_size = window_size
         self._last_write = None  # (step, time) of last call to write(). Used to compute ETA
 
+        # Init Comet Logger
+        self.comet_logger = comet_logger.COMET_LOGGER
+
     def _get_eta(self, storage) -> Optional[str]:
         if self._max_iter is None:
             return ""
@@ -288,6 +294,18 @@ class CommonMetricPrinter(EventWriter):
                 memory="\"max_mem\": \"{:.0f}M\"".format(max_mem_mb) if max_mem_mb is not None else "",
             ))
         )
+        
+        # LOG the same content using Comet
+        self.comet_logger.log_metric("train/eta", eta_string if eta_string else "")
+        self.comet_logger.log_metric("train/iter", iteration)
+        
+        for k, v in storage.histories().items():
+            if "loss" in k:
+                self.comet_logger.log_metric("train/"+k, v.median(self._window_size), step=iteration)
+        self.comet_logger.log_metric("train/time", iter_time if iter_time is not None else "")
+        self.comet_logger.log_metric("train/date_time", data_time if data_time is not None else "")
+        self.comet_logger.log_metric("train/learning_rate", lr, step=iteration)
+        self.comet_logger.log_metric("train/memory", max_mem_mb if max_mem_mb is not None else "", step=iteration)
         
 class EventStorage:
     """
