@@ -91,9 +91,9 @@ class COCOEvaluator(DatasetEvaluator):
         self._logger = logging.getLogger(__name__)
 
 
-        # Init Comet Logger again as the previous process gets closed.
+        """ # Init Comet Logger again as the previous process gets closed.
         comet.init()
-        self.comet_logger = comet.COMET_LOGGER
+        self.comet_logger = comet.COMET_LOGGER """
 
         self._distributed = distributed
         self._output_dir = output_dir
@@ -346,10 +346,10 @@ class COCOEvaluator(DatasetEvaluator):
             for idx, metric in enumerate(metrics)
         }
         
-        for idx, metric in enumerate(metrics):
+        """ for idx, metric in enumerate(metrics):
             # Update the overall standard evaluation metrics to Comet
             self.comet_logger.log_metric("eval/{}/{}".format(iou_type, metric), "{0:.4f}".format(float(coco_eval.stats[idx] * 100 if coco_eval.stats[idx] >= 0 else "nan")))
-        
+         """
         self._logger.info(
             "Evaluation results for {}: \n".format(iou_type) + create_small_table(results)
         )
@@ -582,6 +582,10 @@ def _evaluate_predictions_on_coco(
     """
     assert len(coco_results) > 0
 
+    # Init Comet Logger again as the previous process gets closed.
+    comet.init()
+    comet_logger = comet.COMET_LOGGER
+
     if iou_type == "segm":
         coco_results = copy.deepcopy(coco_results)
         # When evaluating mask AP, if the results contain bbox, cocoapi will
@@ -630,7 +634,7 @@ def _evaluate_predictions_on_coco(
 
     coco_eval.evaluate()
     coco_eval.accumulate()
-    coco_eval.summarize()
+    coco_eval.summarize(comet_logger)
 
     return coco_eval
 
@@ -641,11 +645,7 @@ class COCOevalMaxDets(COCOeval):
     maxDets (by default for COCO, maxDets is 100)
     """
 
-    # Init Comet Logger again as the previous process gets closed.
-    comet.init()
-    this.comet_logger = comet.COMET_LOGGER
-
-    def summarize(self):
+    def summarize(self, comet_logger):
         """
         Compute and display summary metrics for evaluation results given
         a custom value for  max_dets_per_image
@@ -684,7 +684,7 @@ class COCOevalMaxDets(COCOeval):
             else:
                 mean_s = np.mean(s[s > -1])
             print(iStr.format(titleStr, typeStr, iouStr, areaRng, maxDets, mean_s))
-            this.comet_logger.log_metric("eval/{}/{}/{}/{}".format(titleStr, iouStr, areaRng, maxDets), "{:0.3f}".format(mean_s))
+            comet_logger.log_metric("eval/{}/{}/{}/{}".format(titleStr, iouStr, areaRng, maxDets), "{:0.3f}".format(mean_s))
             return mean_s
 
         def _summarizeDets():
@@ -692,10 +692,10 @@ class COCOevalMaxDets(COCOeval):
             # Evaluate AP using the custom limit on maximum detections per image
             stats[0] = _summarize(1, maxDets=self.params.maxDets[2])
             stats[1] = _summarize(1, iouThr=0.5, maxDets=self.params.maxDets[2])
-            stats[2] = _summarize(1, iouThr=0.5, maxDets=self.params.maxDets[2])
-            stats[3] = _summarize(1, iouThr=0.75, maxDets=self.params.maxDets[2])
-            stats[4] = _summarize(1, iouThr=0.5, maxDets=self.params.maxDets[2])
-            stats[5] = _summarize(1, iouThr=0.5, maxDets=self.params.maxDets[2])
+            stats[2] = _summarize(1, iouThr=0.6, maxDets=self.params.maxDets[2])
+            stats[3] = _summarize(1, iouThr=0.7, maxDets=self.params.maxDets[2])
+            stats[4] = _summarize(1, iouThr=0.8, maxDets=self.params.maxDets[2])
+            stats[5] = _summarize(1, iouThr=0.9, maxDets=self.params.maxDets[2])
             stats[6] = _summarize(1, areaRng="small", maxDets=self.params.maxDets[2])
             stats[7] = _summarize(1, areaRng="medium", maxDets=self.params.maxDets[2])
             stats[8] = _summarize(1, areaRng="large", maxDets=self.params.maxDets[2])
@@ -710,7 +710,7 @@ class COCOevalMaxDets(COCOeval):
             stats[17] = _summarize(0, areaRng="small", maxDets=self.params.maxDets[2])
             stats[18] = _summarize(0, areaRng="medium", maxDets=self.params.maxDets[2])
             stats[19] = _summarize(0, areaRng="large", maxDets=self.params.maxDets[2])
-
+            return stats
 
         def _summarizeKps():
             stats = np.zeros((10,))
