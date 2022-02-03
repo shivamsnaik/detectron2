@@ -1,6 +1,4 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
-# Import comet_ml at the top of your file
-from comet_ml import Experiment
 import os
 import datetime
 import logging
@@ -14,7 +12,6 @@ import sys
 
 from detectron2.utils.comm import get_world_size, is_main_process
 from detectron2.utils.logger import log_every_n_seconds
-import detectron2.comet_logger as comet
 
 
 class DatasetEvaluator:
@@ -230,27 +227,6 @@ def _find_caller():
                 mod_name = "detectron2"
             return mod_name, (code.co_filename, frame.f_lineno, code.co_name)
         frame = frame.f_back
-
-_LOG_TIMER = {}
-
-def log_comet_every_n_seconds(comet_logger, message, n=1, *, name=None):
-    """
-    Log no more than once per n seconds.
-    Args:
-        lvl (int): the logging level
-        msg (str):
-        n (int):
-        name (str): name of the logger to use. Will use the caller's module by default.
-    """
-    caller_module, key = _find_caller()
-    last_logged = _LOG_TIMER.get(key, None)
-    current_time = time.time()
-    if last_logged is None or current_time - last_logged >= n:
-        
-        for key, val in message.items():
-            comet_logger.log_metric(key, val)
-        _LOG_TIMER[key] = current_time
-
 
 @contextmanager
 def inference_context(model):
