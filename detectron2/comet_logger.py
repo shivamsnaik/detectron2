@@ -7,32 +7,6 @@
 # ==============================================================================
 
 # Import comet_ml at the top of your file
-from comet_ml import Experiment, ExistingExperiment
-import os
-
-COMET_LOGGER = None
-
-def init():
-    # Init Comet Logger as Global
-    global COMET_LOGGER
-
-    try:
-        COMET_LOGGER = Experiment(
-            api_key=os.environ['COMET_API_KEY'],
-            project_name="dynamichead",
-            workspace="shivamsnaik",
-            auto_output_logging="simple",
-            experiment_key=os.environ['COMET_EXPERIMENT_KEY']
-        )
-    except:
-        COMET_LOGGER = ExistingExperiment(
-            api_key=os.environ['COMET_API_KEY'],
-            project_name="dynamichead",
-            workspace="shivamsnaik",
-            auto_output_logging="simple",
-            previous_experiment=os.environ['COMET_EXPERIMENT_KEY']
-        )
-
 import comet_ml
 import os
 
@@ -82,8 +56,7 @@ def init():
             api_key=os.environ['COMET_API_KEY'],
             project_name="dynamichead",
             workspace="shivamsnaik",
-            auto_output_logging="simple",
-            experiment_key=os.environ['COMET_EXPERIMENT_KEY']
+            experiment_key=EXPERIMENT_KEY
         )
         
         # 2. Setup the state of the ML system
