@@ -579,12 +579,10 @@ def _evaluate_predictions_on_coco(
     """
     Evaluate the coco results using COCOEval API.
     """
-    import detectron2.comet_logger as comet
+    
     assert len(coco_results) > 0
 
-    # Init Comet Logger again as the previous process gets closed.
-    comet.init()
-    comet_logger = comet.COMET_LOGGER
+    
 
     if iou_type == "segm":
         coco_results = copy.deepcopy(coco_results)
@@ -634,7 +632,7 @@ def _evaluate_predictions_on_coco(
 
     coco_eval.evaluate()
     coco_eval.accumulate()
-    coco_eval.summarize(comet_logger)
+    coco_eval.summarize()
 
     return coco_eval
 
@@ -645,13 +643,19 @@ class COCOevalMaxDets(COCOeval):
     maxDets (by default for COCO, maxDets is 100)
     """
 
-    def summarize(self, comet_logger):
+    def summarize(self):
         """
         Compute and display summary metrics for evaluation results given
         a custom value for  max_dets_per_image
         """
 
         def _summarize(ap=1, iouThr=None, areaRng="all", maxDets=100):
+
+            import detectron2.comet_logger as comet
+            # Init Comet Logger again as the previous process gets closed.
+            comet.init()
+            comet_logger = comet.COMET_LOGGER
+            
             p = self.params
             iStr = " {:<18} {} @[ IoU={:<9} | area={:>6s} | maxDets={:>3d} ] = {:0.3f}"
             titleStr = "Average Precision" if ap == 1 else "Average Recall"
