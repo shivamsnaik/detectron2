@@ -25,7 +25,7 @@ def init():
         # There is one, but the experiment might not exist yet:
         api = comet_ml.API() # Assumes API key is set in config/env
         try:
-            api_experiment = api.get_experiment_by_id(EXPERIMENT_KEY)
+            api_experiment = api.get_experiment_by_key(EXPERIMENT_KEY)
         except Exception:
             api_experiment = None
         if api_experiment is not None:
@@ -40,10 +40,8 @@ def init():
             api_key=os.environ['COMET_API_KEY'],
             project_name="dynamichead",
             workspace="shivamsnaik",
+            auto_output_logging="simple"
             previous_experiment=EXPERIMENT_KEY,
-            log_env_details=True, # to continue env logging
-            log_env_gpu=True,     # to continue GPU logging
-            log_env_cpu=True,     # to continue CPU logging
         )
 
     else:
@@ -56,6 +54,7 @@ def init():
             api_key=os.environ['COMET_API_KEY'],
             project_name="dynamichead",
             workspace="shivamsnaik",
+            auto_output_logging="simple"
             experiment_key=EXPERIMENT_KEY
         )
         
