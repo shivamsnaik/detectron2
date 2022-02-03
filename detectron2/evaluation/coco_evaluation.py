@@ -91,7 +91,8 @@ class COCOEvaluator(DatasetEvaluator):
         self._logger = logging.getLogger(__name__)
 
 
-        # Init Comet Logger
+        # Init Comet Logger again as the previous process gets closed.
+        comet.init()
         self.comet_logger = comet.COMET_LOGGER
 
         self._distributed = distributed
@@ -639,8 +640,10 @@ class COCOevalMaxDets(COCOeval):
     Modified version of COCOeval for evaluating AP with a custom
     maxDets (by default for COCO, maxDets is 100)
     """
-    # Init Comet Logger
-    self.comet_logger = comet.COMET_LOGGER
+
+    # Init Comet Logger again as the previous process gets closed.
+    comet.init()
+    this.comet_logger = comet.COMET_LOGGER
 
     def summarize(self):
         """
@@ -681,7 +684,7 @@ class COCOevalMaxDets(COCOeval):
             else:
                 mean_s = np.mean(s[s > -1])
             print(iStr.format(titleStr, typeStr, iouStr, areaRng, maxDets, mean_s))
-            self.comet_logger.log_metric("eval/{}/{}/{}/{}".format(titleStr, iouStr, areaRng, maxDets), "{:0.3f}".format(mean_s))
+            this.comet_logger.log_metric("eval/{}/{}/{}/{}".format(titleStr, iouStr, areaRng, maxDets), "{:0.3f}".format(mean_s))
             return mean_s
 
         def _summarizeDets():
